@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Briefcase Bleed</title>
+    <title>The Briefcase Bleed 2.0</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,38 +11,42 @@
             background: #f0f0f0;
             margin: 0;
             padding: 20px;
+            font-size: 16px;
         }
-        #briefcase {
-            width: 250px;
-            height: 150px;
-            background: #333;
-            margin: 20px auto;
-            border-radius: 10px;
+        #scene {
             position: relative;
+            width: 400px;
+            height: 300px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             overflow: hidden;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
         }
-        .coin {
-            width: 20px;
-            height: 20px;
-            background: gold;
-            border-radius: 50%;
+        #briefcase-open {
             position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 60px;
+            color: #333;
+        }
+        .money {
+            position: absolute;
+            font-size: 30px;
             animation: bleed 2s linear infinite;
         }
         @keyframes bleed {
-            0% { top: 0; opacity: 1; }
-            100% { top: 130px; opacity: 0; }
+            0% { top: 100px; opacity: 1; }
+            100% { top: 250px; opacity: 0; }
         }
         #pile {
-            width: 200px;
-            height: 50px;
-            background: #ffd700;
-            margin: 0 auto;
-            border-radius: 5px;
-            line-height: 50px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
             color: #333;
-            font-weight: bold;
         }
         #counter {
             font-size: 24px;
@@ -76,19 +80,30 @@
         button:hover {
             background: #c82333;
         }
-        .saved {
-            animation: heal 2s linear infinite;
+        #briefcase-closed {
+            position: absolute;
+            top: 50px;
+            left: -200px;
+            font-size: 60px;
+            color: #333;
+            transition: left 1s ease;
         }
-        @keyframes heal {
-            0% { top: 130px; opacity: 0; }
-            100% { top: 0; opacity: 1; }
+        .saved {
+            animation: collect 2s linear infinite;
+        }
+        @keyframes collect {
+            0% { top: 250px; opacity: 0; }
+            100% { top: 100px; opacity: 1; left: 50%; transform: translateX(-50%) scale(1.5); }
         }
     </style>
 </head>
 <body>
-    <h1>The Briefcase Bleed</h1>
-    <div id="briefcase"></div>
-    <div id="pile">Money Pit</div>
+    <h1>The Briefcase Bleed 2.0</h1>
+    <div id="scene">
+        <div id="briefcase-open">💼</div>
+        <div id="pile">💸 Money Pit</div>
+        <div id="briefcase-closed" style="display: none;">💼</div>
+    </div>
     <div id="counter">£0 lost</div>
     <div id="message">Your firm’s bleeding £8,000 a year!<br>Plug it with <a href="https://briefcase.so" target="_blank">Briefcase</a>.</div>
     <div id="assumptions">
@@ -103,16 +118,19 @@
     <script>
         let loss = 0;
         let saved = false;
+        const scene = document.getElementById('scene');
         const counter = document.getElementById('counter');
-        const briefcase = document.getElementById('briefcase');
+        const briefcaseOpen = document.getElementById('briefcase-open');
+        const briefcaseClosed = document.getElementById('briefcase-closed');
 
-        function addCoin() {
+        function addMoney() {
             if (!saved) {
-                const coin = document.createElement('div');
-                coin.className = 'coin';
-                coin.style.left = Math.random() * 230 + 'px';
-                briefcase.appendChild(coin);
-                setTimeout(() => coin.remove(), 2000);
+                const money = document.createElement('div');
+                money.className = 'money';
+                money.textContent = '🪙'; // Using money bag emoji, or '£' for pound sign
+                money.style.left = Math.random() * 350 + 'px';
+                scene.appendChild(money);
+                setTimeout(() => money.remove(), 2000);
 
                 loss += 0.03; // £0.03 per second for dramatic effect
                 if (loss <= 8000) counter.textContent = `£${Math.floor(loss)} lost`;
@@ -123,22 +141,31 @@
             saved = !saved;
             if (saved) {
                 counter.textContent = '£7,200 saved!';
-                document.querySelectorAll('.coin').forEach(coin => {
-                    coin.className = 'coin saved';
+                document.querySelectorAll('.money').forEach(money => {
+                    money.className = 'money saved';
                 });
+                briefcaseOpen.style.display = 'none';
+                briefcaseClosed.style.display = 'block';
+                briefcaseClosed.style.left = '50%';
+                briefcaseClosed.style.transform = 'translateX(-50%)';
                 document.getElementById('message').textContent = 'Bleed stopped! Briefcase saves £7,200.';
-                document.getElementById('pile').textContent = 'Safe & Sound';
+                document.getElementById('pile').textContent = '💼 Safe & Sound';
                 document.querySelector('button').style.background = '#28a745';
             } else {
                 loss = 0;
                 counter.textContent = '£0 lost';
                 document.getElementById('message').textContent = 'Your firm’s bleeding £8,000 a year! Plug it with Briefcase.';
-                document.getElementById('pile').textContent = 'Money Pit';
+                document.getElementById('pile').textContent = '💸 Money Pit';
+                briefcaseClosed.style.left = '-200px';
+                briefcaseOpen.style.display = 'block';
+                briefcaseClosed.style.display = 'none';
                 document.querySelector('button').style.background = '#dc3545';
+                // Remove saved money elements
+                document.querySelectorAll('.money').forEach(money => money.remove());
             }
         }
 
-        setInterval(addCoin, 100); // Coins spill every 0.1s
+        setInterval(addMoney, 100); // Money spills every 0.1s
     </script>
 </body>
 </html>
