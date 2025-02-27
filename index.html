@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Briefcase Bleed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #briefcase {
+            width: 250px;
+            height: 150px;
+            background: #333;
+            margin: 20px auto;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+        }
+        .coin {
+            width: 20px;
+            height: 20px;
+            background: gold;
+            border-radius: 50%;
+            position: absolute;
+            animation: bleed 2s linear infinite;
+        }
+        @keyframes bleed {
+            0% { top: 0; opacity: 1; }
+            100% { top: 130px; opacity: 0; }
+        }
+        #pile {
+            width: 200px;
+            height: 50px;
+            background: #ffd700;
+            margin: 0 auto;
+            border-radius: 5px;
+            line-height: 50px;
+            color: #333;
+            font-weight: bold;
+        }
+        #counter {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+        #message {
+            font-size: 18px;
+            color: #666;
+            margin: 20px 0;
+        }
+        #assumptions {
+            font-size: 14px;
+            color: #444;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 400px;
+            margin: 20px auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #c82333;
+        }
+        .saved {
+            animation: heal 2s linear infinite;
+        }
+        @keyframes heal {
+            0% { top: 130px; opacity: 0; }
+            100% { top: 0; opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>The Briefcase Bleed</h1>
+    <div id="briefcase"></div>
+    <div id="pile">Money Pit</div>
+    <div id="counter">£0 lost</div>
+    <div id="message">Your firm’s bleeding £8,000 a year!<br>Plug it with <a href="https://briefcase.so" target="_blank">Briefcase</a>.</div>
+    <div id="assumptions">
+        <strong>Assumptions:</strong><br>
+        - 1,000 transactions/month<br>
+        - 2 mins/transaction<br>
+        - £20/hour accountant rate<br>
+        - Total: £8,000/year lost
+    </div>
+    <button onclick="toggleSave()">Stop the Bleed</button>
+
+    <script>
+        let loss = 0;
+        let saved = false;
+        const counter = document.getElementById('counter');
+        const briefcase = document.getElementById('briefcase');
+
+        function addCoin() {
+            if (!saved) {
+                const coin = document.createElement('div');
+                coin.className = 'coin';
+                coin.style.left = Math.random() * 230 + 'px';
+                briefcase.appendChild(coin);
+                setTimeout(() => coin.remove(), 2000);
+
+                loss += 0.03; // £0.03 per second for dramatic effect
+                if (loss <= 8000) counter.textContent = `£${Math.floor(loss)} lost`;
+            }
+        }
+
+        function toggleSave() {
+            saved = !saved;
+            if (saved) {
+                counter.textContent = '£7,200 saved!';
+                document.querySelectorAll('.coin').forEach(coin => {
+                    coin.className = 'coin saved';
+                });
+                document.getElementById('message').textContent = 'Bleed stopped! Briefcase saves £7,200.';
+                document.getElementById('pile').textContent = 'Safe & Sound';
+                document.querySelector('button').style.background = '#28a745';
+            } else {
+                loss = 0;
+                counter.textContent = '£0 lost';
+                document.getElementById('message').textContent = 'Your firm’s bleeding £8,000 a year! Plug it with Briefcase.';
+                document.getElementById('pile').textContent = 'Money Pit';
+                document.querySelector('button').style.background = '#dc3545';
+            }
+        }
+
+        setInterval(addCoin, 100); // Coins spill every 0.1s
+    </script>
+</body>
+</html>
